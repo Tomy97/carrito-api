@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Domain\Model\OrderItem as ModelOrderItem;
 use App\Entity\OrderItem;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -13,7 +14,7 @@ class OrderItemRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, OrderItem::class);
+        parent::__construct($registry, ModelOrderItem::class);
     }
 
 //    /**

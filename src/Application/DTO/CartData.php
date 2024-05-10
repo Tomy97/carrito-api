@@ -13,17 +13,3 @@ class CartData
         $this->total = $total;
     }
 }
-
-class CartItemData
-{
-    public $productId;
-    public $quantity;
-    public $total;
-
-    public function __construct($productId, $quantity, $total)
-    {
-        $this->productId = $productId;
-        $this->quantity = $quantity;
-        $this->total = $total;
-    }
-}

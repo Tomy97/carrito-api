@@ -2,38 +2,52 @@
 
 namespace App\Infrastructure\Repository;
 
-use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Domain\Model\Product;
-use App\Domain\Repository\ProductRepositoryInterface as RepositoryProductRepositoryInterface;
+use App\Domain\Repository\ProductRepositoryInterface;
 
-class DoctrineProductRepository extends EntityRepository implements RepositoryProductRepositoryInterface
+class DoctrineProductRepository implements ProductRepositoryInterface
 {
-    public function find($id, $lockMode = null, $lockVersion = null): ?Product
-    {
-        return $this->getEntityManager()->find(Product::class, $id);
-    }
 
-    public function findBy(array $criteria, ?array $orderBy = null, $limit = null, $offset = null): array
+    private EntityManagerInterface $entityManager;
+    private $repository;
+
+
+    public function __construct(EntityManagerInterface $entityManager)
     {
-        return parent::findBy($criteria, $orderBy, $limit, $offset);
+        $this->entityManager = $entityManager;
+        $this->repository = $this->entityManager->getRepository(Product::class);
     }
 
     public function findAll(): array
     {
-        return $this->getEntityManager()->getRepository(Product::class)->findAll();
+        return $this->repository->findAll();
+    }
+
+    public function find($id): ?Product
+    {
+        return $this->repository->find($id);
+    }
+
+    public function findBy(array $criteria): array
+    {
+        return $this->repository->findBy($criteria);
     }
 
     public function save(Product $product): void
     {
-        $em = $this->getEntityManager();
-        $em->persist($product);
-        $em->flush();
+        $this->entityManager->persist($product);
+        $this->entityManager->flush();
     }
 
     public function remove(Product $product): void
     {
-        $em = $this->getEntityManager();
-        $em->remove($product);
-        $em->flush();
+        $this->entityManager->remove($product);
+        $this->entityManager->flush();
+    }
+
+    public function update(Product $product): void
+    {
+        $this->entityManager->flush();
     }
 }

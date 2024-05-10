@@ -6,7 +6,7 @@ use App\Domain\Model\Cart;
 
 interface CartRepositoryInterface
 {
-    public function findByUserId($userId): ?Cart;
+    public function getCart(): Cart;
+    public function getCartData(): array;
     public function save(Cart $cart): void;
-    public function remove(Cart $cart): void;
 }

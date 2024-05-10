@@ -1,5 +1,4 @@
-controllers:
-    resource:
-        path: ../src/Interfaces/Controller
-        namespace: App\Interfaces\Controller
-    type: attribute
+productList:
+    path: /products
+    controller: App\Interfaces\Controller\ProductController::productList
+    methods: [GET]

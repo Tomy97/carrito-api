@@ -3,23 +3,20 @@
 namespace App\Interfaces\Controller;
 
 use App\Application\Service\CartService;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 
-class CartController
+class CartController extends AbstractController
 {
-    private $cartService;
-
-    public function __construct(CartService $cartService)
+    #[Route('/cart', name: 'app_cart')]
+    public function index(): JsonResponse
     {
-        $this->cartService = $cartService;
+        return $this->json([
+            'message' => 'Welcome to your new controller este es el viejo controller!',
+            'path' => 'src/Controller/CartController.php',
+        ]);
     }
-
-    /**
-     * @Route("/cart/{userId}", methods="GET")
-     */
-    public function getCart($userId)
-    {
-        $cartData = $this->cartService->getCartDetails($userId);
-        return new Response(json_encode($cartData), Response::HTTP_OK);
-    }
+    
 }

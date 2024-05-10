@@ -14,19 +14,21 @@ class Product
     private ?int $id = null;
 
     #[ORM\Column]
-    private string $name; 
+    private string $name;
 
     #[ORM\Column]
     private string $description;
+
+    #[ORM\Column]
+    private string $category;
 
     #[ORM\Column(type: "decimal", precision: 10, scale: 2)]
     private float $price;
 
     #[ORM\Column]
     private int $stock;
-
-    #[ORM\Column(type: "text", nullable: true)]
-    private ?string $imageBase64 = null;
+    #[ORM\Column(type: "string", length: 255, nullable: true)]
+    private ?string $imageFilename = null;
 
     public function getId(): ?int
     {
@@ -77,14 +79,25 @@ class Product
         return $this;
     }
 
-    public function getImageBase64(): ?string
+    public function getImageFilename(): ?string
     {
-        return $this->imageBase64;
+        return $this->imageFilename;
     }
 
-    public function setImageBase64(?string $imageBase64): self
+    public function setImageFilename(?string $imageFilename): self
     {
-        $this->imageBase64 = $imageBase64;
+        $this->imageFilename = $imageFilename;
+        return $this;
+    }
+
+    public function getCategory(): string
+    {
+        return $this->category;
+    }
+
+    public function setCategory(string $category): self
+    {
+        $this->category = $category;
         return $this;
     }
 }
