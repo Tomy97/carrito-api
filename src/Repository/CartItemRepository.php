@@ -2,7 +2,7 @@
 
 namespace App\Repository;
 
-use App\Domain\Model\CartItem as ModelCartItem;
+use App\Domain\Model\CartProduct as ModelCartItem;
 use App\Entity\CartItem;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -18,7 +18,7 @@ class CartItemRepository extends ServiceEntityRepository
     }
 
 //    /**
-//     * @return CartItem[] Returns an array of CartItem objects
+//     * @return CartProduct[] Returns an array of CartProduct objects
 //     */
 //    public function findByExampleField($value): array
 //    {
@@ -32,7 +32,7 @@ class CartItemRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?CartItem
+//    public function findOneBySomeField($value): ?CartProduct
 //    {
 //        return $this->createQueryBuilder('c')
 //            ->andWhere('c.exampleField = :val')

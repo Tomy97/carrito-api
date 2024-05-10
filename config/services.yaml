@@ -19,20 +19,54 @@ services:
       - "../src/DependencyInjection/**/*"
       - "../src/Entity/"
       - "../src/Kernel.php"
+
+  ## Controllers
   App\Interfaces\Controller\ProductController:
     public: true
     autowire: true
     tags: [ 'controller.service_arguments' ]
 
+  App\Interfaces\Controller\UserController:
+    public: true
+    autowire: true
+    tags: [ 'controller.service_arguments' ]
+
+  ## Doctrine
   App\Infrastructure\Repository\DoctrineProductRepository:
     arguments:
       $entityManager: '@doctrine.orm.entity_manager'
     autowire: true
     public: false
+
+  App\Infrastructure\Repository\DoctrineUserRepository:
+    arguments:
+      $entityManager: '@doctrine.orm.entity_manager'
+    autowire: true
+    public: false
+
+  App\Infrastructure\Repository\DoctrineRolRepository:
+    arguments:
+      $entityManager: '@doctrine.orm.entity_manager'
+    autowire: true
+    autoconfigure: true
+
+  ## Services
   App\Application\Service\ProductService:
     arguments:
       $productRepository: '@App\Infrastructure\Repository\DoctrineProductRepository'
 
+  App\Application\Service\UserService:
+    arguments:
+      $userRepository: '@App\Infrastructure\Repository\DoctrineUserRepository'
+      $passwordHasher: '@Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface'
+      $rolRepository: '@App\Infrastructure\Repository\DoctrineRolRepository'
+
+  ## Repositorys
+
+  App\Repository\UserRepository:
+    autowire: true
+    tags:
+      - { name: 'doctrine.repository_service' }
 doctrine_migrations:
   migrations_paths:
     "DoctrineMigrations": "%kernel.project_dir%/migrations"

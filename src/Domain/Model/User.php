@@ -8,7 +8,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-class User
+class User implements \Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -24,15 +24,17 @@ class User
     #[ORM\Column(type: "string", length: 255)]
     private string $name;
 
-    #[ORM\Column(type: "decimal", precision: 10, scale: 2)]
-    private float $balance;
+    #[ORM\Column(type: "decimal", precision: 10, scale: 2,)]
+    private float $balance = 0;
 
-    #[ORM\ManyToMany(targetEntity: Product::class, cascade: ['persist'])]
-    #[ORM\JoinTable(name: "user_products")]
-    private $products;
+    #[ORM\ManyToOne(targetEntity: Rol::class, inversedBy: "users")]
+    #[ORM\JoinColumn(name: "rol_id", referencedColumnName: "id")]
+    private ?Rol $rol = null;
 
-    #[ORM\OneToMany(mappedBy: "user", targetEntity: Order::class)]
-    private $orders;
+    #[ORM\ManyToMany(targetEntity: Cart::class, inversedBy: "users")]
+    #[ORM\JoinColumn(name: "cart_id", referencedColumnName: "id")]
+    private ?Cart $cart = null;
+
 
     public function __construct()
     {
@@ -90,25 +92,25 @@ class User
         return $this;
     }
 
-    public function getProducts()
+    public function getRol(): ?Rol
     {
-        return $this->products;
+        return $this->rol;
     }
 
-    public function addProduct(Product $product)
+    public function setRol(?Rol $rol): self
     {
-        $this->products[] = $product;
+        $this->rol = $rol;
         return $this;
     }
 
-    public function getOrders()
+    public function getCart(): ?Cart
     {
-        return $this->orders;
+        return $this->cart;
     }
 
-    public function addOrder(Order $order)
+    public function setCart(?Cart $cart): self
     {
-        $this->orders[] = $order;
+        $this->cart = $cart;
         return $this;
     }
 }

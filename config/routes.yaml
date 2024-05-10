@@ -2,3 +2,13 @@ productList:
     path: /products
     controller: App\Interfaces\Controller\ProductController::productList
     methods: [GET]
+
+register:
+    path: /register
+    controller: App\Interfaces\Controller\UserController::register
+    methods: [POST]
+
+login:
+    path: /login
+    controller: App\Interfaces\Controller\UserController::login
+    methods: [POST]

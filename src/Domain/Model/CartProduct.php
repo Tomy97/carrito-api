@@ -6,7 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use App\Repository\CartItemRepository;
 
 #[ORM\Entity(repositoryClass: CartItemRepository::class)]
-class CartItem
+class CartProduct
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
