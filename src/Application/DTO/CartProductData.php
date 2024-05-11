@@ -2,7 +2,7 @@
 
 namespace App\Application\DTO;
 
-class CartItemData
+class CartProductData
 {
     public $productId;
 

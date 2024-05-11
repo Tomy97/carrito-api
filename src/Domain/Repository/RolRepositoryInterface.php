@@ -6,5 +6,5 @@ use App\Domain\Model\Rol;
 
 interface RolRepositoryInterface
 {
-    public function setRol(int $id): Rol;
+    public function getRol(int $id): Rol;
 }

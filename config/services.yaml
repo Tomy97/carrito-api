@@ -60,6 +60,7 @@ services:
       $userRepository: '@App\Infrastructure\Repository\DoctrineUserRepository'
       $passwordHasher: '@Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface'
       $rolRepository: '@App\Infrastructure\Repository\DoctrineRolRepository'
+      $cartRepository: '@App\Infrastructure\Repository\DoctrineCartRepository'
 
   ## Repositorys
 

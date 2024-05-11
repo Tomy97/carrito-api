@@ -40,4 +40,9 @@ class DoctrineUserRepository implements UserRepositoryInterface
     {
         return $this->repository->find($id);
     }
+
+    public function findById(int $id): ?User
+    {
+        return $this->repository->find($id);
+    }
 }

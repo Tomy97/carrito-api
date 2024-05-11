@@ -31,7 +31,7 @@ class User implements \Symfony\Component\Security\Core\User\PasswordAuthenticate
     #[ORM\JoinColumn(name: "rol_id", referencedColumnName: "id")]
     private ?Rol $rol = null;
 
-    #[ORM\ManyToMany(targetEntity: Cart::class, inversedBy: "users")]
+    #[ORM\ManyToOne(targetEntity: Cart::class, inversedBy: "users")]
     #[ORM\JoinColumn(name: "cart_id", referencedColumnName: "id")]
     private ?Cart $cart = null;
 

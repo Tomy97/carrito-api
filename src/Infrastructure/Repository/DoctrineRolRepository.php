@@ -18,7 +18,7 @@ class DoctrineRolRepository extends EntityRepository implements RolRepositoryInt
         $this->repository = $entityManager->getRepository(Rol::class);
     }
 
-    public function setRol(int $id): Rol
+    public function getRol(int $id): Rol
     {
         return $this->repository->find($id);
     }

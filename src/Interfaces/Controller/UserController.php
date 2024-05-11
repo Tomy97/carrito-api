@@ -31,17 +31,25 @@ class UserController extends AbstractController
         $email = $data['email'];
         $password = $data['password'];
         $name = $data['name'];
+        $rol = $data['rol'] ?? null;
 
         if (!$email || !$password || !$name) {
             return new JsonResponse(['error' => 'Missing required parameters'], Response::HTTP_BAD_REQUEST);
         }
 
-        $user = $this->userService->registerUserService($email, $password, $name);
+        $user = $this->userService->registerUserService($email, $password, $name, $rol);
         var_dump('user controller', $user);
 
         return new JsonResponse([
             'success' => true,
-            'userId' => $user->getId(),
+            'user' => [
+                'id' => $user->getId(),
+                'email' => $user->getEmail(),
+                'name' => $user->getName(),
+                'rol' => $user->getRol()->getName(),
+                'cartId' => $user->getCart()->getId(),
+                'balance' => $user->getBalance()
+            ],
             'message' => 'User registered successfully'
         ], Response::HTTP_CREATED);
     }
@@ -49,15 +57,32 @@ class UserController extends AbstractController
     #[Route('/login', name: 'login_user', methods: ['POST'])]
     public function login(Request $request): JsonResponse
     {
-        $email = $request->request->get('email');
-        $password = $request->request->get('password');
+        $contentType = $request->headers->get('Content-Type');
+        if (str_contains($contentType, 'application/json')) {
+            $data = json_decode($request->getContent(), true);
+        } else {
+            $data = $request->request->all();
+        }
+
+        $email = $data['email'];
+        $password = $data['password'];
 
         $isLogged = $this->userService->loginUserService($email, $password);
 
         if ($isLogged) {
+
+            $user = $this->userService->getUserByEmail($email);
             return new JsonResponse([
                 'success' => true,
-                'message' => 'User logged in successfully'
+                'user' => [
+                    'id' => $user->getId(),
+                    'email' => $user->getEmail(),
+                    'name' => $user->getName(),
+                    'rol' => $user->getRol()->getName(),
+                    'cartId' => $user->getCart()->getId(),
+                    'balance' => $user->getBalance(),
+                ],
+                'message' => 'Usuario logueado correctamente'
             ]);
         }
 
