@@ -79,7 +79,6 @@ class UserController extends AbstractController
                     'email' => $user->getEmail(),
                     'name' => $user->getName(),
                     'rol' => $user->getRol()->getName(),
-                    'cartId' => $user->getCart()->getId(),
                     'balance' => $user->getBalance(),
                 ],
                 'message' => 'Usuario logueado correctamente'
