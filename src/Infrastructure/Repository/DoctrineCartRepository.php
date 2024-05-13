@@ -5,8 +5,10 @@ namespace App\Infrastructure\Repository;
 use App\Domain\Model\Cart;
 use App\Domain\Model\CartProduct;
 use App\Domain\Repository\CartRepositoryInterface;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Query\Parameter;
 
 class DoctrineCartRepository implements CartRepositoryInterface
 {
@@ -90,13 +92,14 @@ class DoctrineCartRepository implements CartRepositoryInterface
         return $qb->getQuery()->getOneOrNullResult();
     }
 
-    public function findCartProductById(int $productId)
+    public function findCartProductById(int $productId, int $cartId): Cart
     {
         $qb = $this->entityManager->createQueryBuilder();
         $qb->select('cp')
             ->from(CartProduct::class, 'cp')
             ->where('cp.product = :productId')
-            ->setParameter('productId', $productId);
+            ->andWhere('cp.cart = :cartId')
+            ->setParameters(new ArrayCollection(array(new Parameter('productId', $productId), new Parameter('cartId', $cartId))));
 
         return $qb->getQuery()->getOneOrNullResult();
     }

@@ -44,18 +44,33 @@ class CartController extends AbstractController
 
     private function formatCart(Cart $cart): array
     {
-        return [
-            'id' => $cart->getId(),
-            'products' => array_map(function (CartProduct $cartProduct) {
-                return [
-                    'id' => $cartProduct->getProduct()->getId(),
+        $productsAggregated = [];
+
+        foreach ($cart->getCartProducts() as $cartProduct) {
+            $productId = $cartProduct->getProduct()->getId();
+            if (!isset($productsAggregated[$productId])) {
+                $productsAggregated[$productId] = [
+                    'id' => $productId,
                     'name' => $cartProduct->getProduct()->getName(),
-                    'price' => $cartProduct->getProduct()->getPrice(),
+                    'price' => $cartProduct->getProduct()->getPrice() * $cartProduct->getQuantity(),
                     'quantity' => $cartProduct->getQuantity(),
                     'stock' => $cartProduct->getProduct()->getStock(),
-                    'image' => $cartProduct->getProduct()->getImageFilename()
+                    'image' => $cartProduct->getProduct()->getImageFilename(),
                 ];
-            }, $cart->getCartProducts()->toArray())
+            } else {
+                $productsAggregated[$productId]['quantity'] += $cartProduct->getQuantity();
+                $productsAggregated[$productId]['price'] += $cartProduct->getProduct()->getPrice() * $cartProduct->getQuantity();
+            }
+        }
+
+        // Debugging: Imprimir las URLs justo antes de devolver la respuesta
+        foreach ($productsAggregated as $product) {
+            error_log("URL de la imagen: " . $product['image']);
+        }
+
+        return [
+            'id' => $cart->getId(),
+            'products' => array_values($productsAggregated)
         ];
     }
 
