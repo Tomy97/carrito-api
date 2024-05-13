@@ -79,10 +79,13 @@ class DoctrineCartRepository implements CartRepositoryInterface
     public function findCartWithProducts(int $userId): Cart
     {
         $qb = $this->entityManager->createQueryBuilder();
-        $qb->select('c', 'p')
+        $qb->select('c', 'cp', 'p')
             ->from(Cart::class, 'c')
-            ->leftJoin('c.products', 'p')
+            ->leftJoin('c.cartProducts', 'cp')  // Se asume que en Cart está definido cartProducts
+            ->leftJoin('cp.product', 'p')       // CartProduct tiene una propiedad product
             ->where('c.user = :userId')
             ->setParameter('userId', $userId);
+
+        return $qb->getQuery()->getOneOrNullResult();
     }
 }

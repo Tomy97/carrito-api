@@ -86,6 +86,12 @@ class User implements PasswordAuthenticatedUserInterface
         return $this->balance;
     }
 
+    public function setBalance(float $balance): self
+    {
+        $this->balance = $balance;
+        return $this;
+    }
+
     public function getRol(): ?Rol
     {
         return $this->rol;

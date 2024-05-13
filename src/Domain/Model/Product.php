@@ -4,6 +4,7 @@ namespace App\Domain\Model;
 
 use App\Repository\ProductRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
 class Product
@@ -11,9 +12,11 @@ class Product
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['cart_details'])]
     private ?int $id = null;
 
     #[ORM\Column]
+    #[Groups(['cart_details'])]
     private string $name;
 
     #[ORM\Column]

@@ -3,7 +3,10 @@
 namespace App\Interfaces\Controller;
 
 use App\Application\Service\CartService;
+use App\Domain\Model\Cart;
+use App\Domain\Model\CartProduct;
 use App\Domain\Repository\ProductRepositoryInterface;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,19 +27,36 @@ class CartController extends AbstractController
     }
 
     #[Route('/cart', name: 'get_cart', methods: ['GET'])]
-    public function getCart(Request $request, SerializerInterface $serializer): JsonResponse
+    public function getCart(Request $request): JsonResponse
     {
-        $userId = $request->query->get('userId');
-        if ($userId === null) {
+        $userId = $request->query->get('userId'); // Esto captura el userId del query string de la URL.
+
+        if (null === $userId) {
             return new JsonResponse(['error' => 'User ID is required'], Response::HTTP_BAD_REQUEST);
         }
 
         $cart = $this->cartService->getCartService((int)$userId);
 
-        // Serialize the cart using the 'cart_details' group
-        $data = $serializer->serialize($cart, 'json', ['groups' => ['cart_details']]);
+        if (!$cart) {
+            return new JsonResponse(['error' => 'Cart not found'], Response::HTTP_NOT_FOUND);
+        }
 
-        return new JsonResponse($data, Response::HTTP_OK, [], true);
+        // Luego, puedes manejar la serialización manualmente si no usas Serializer
+        return new JsonResponse($this->formatCart($cart));
+    }
+
+    private function formatCart(Cart $cart): array
+    {
+        return [
+            'id' => $cart->getId(),
+            'products' => array_map(function (CartProduct $cartProduct) {
+                return [
+                    'id' => $cartProduct->getProduct()->getId(),
+                    'name' => $cartProduct->getProduct()->getName(),
+                    'quantity' => $cartProduct->getQuantity()
+                ];
+            }, $cart->getCartProducts()->toArray())
+        ];
     }
 
     #[Route('/cart', name: 'add_cart', methods: ['POST'])]
