@@ -38,7 +38,6 @@ class UserController extends AbstractController
         }
 
         $user = $this->userService->registerUserService($email, $password, $name, $rol);
-        var_dump('user controller', $user);
 
         return new JsonResponse([
             'success' => true,
@@ -64,6 +63,7 @@ class UserController extends AbstractController
             $data = $request->request->all();
         }
 
+
         $email = $data['email'];
         $password = $data['password'];
 
@@ -88,7 +88,7 @@ class UserController extends AbstractController
 
         return new JsonResponse([
             'success' => false,
-            'message' => 'Invalid credentials'
+            'message' => 'Credenciales Invalidas'
         ]);
     }
 }

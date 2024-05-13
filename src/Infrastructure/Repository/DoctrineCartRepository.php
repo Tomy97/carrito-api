@@ -33,8 +33,11 @@ class DoctrineCartRepository implements CartRepositoryInterface
 
     public function findByUserId($userId): Cart
     {
-        return $this->findOneBy(['userId' => $userId]);
+        return $this->entityManager->getRepository(Cart::class)->findOneBy([
+            'user' => $userId
+        ]);
     }
+
 
     public function findOneBy(): Cart
     {
@@ -44,5 +47,30 @@ class DoctrineCartRepository implements CartRepositoryInterface
     public function findAll(): array
     {
         return $this->findAll();
+    }
+
+    public function getProducts(): array
+    {
+        return $this->repository->getProducts();
+    }
+
+    public function addProduct($product): void
+    {
+        $this->repository->addProduct($product);
+    }
+
+    public function removeProduct($product): void
+    {
+        $this->repository->removeProduct($product);
+    }
+
+    public function getTotal(): float
+    {
+        return $this->repository->getTotal();
+    }
+
+    public function getId(): int
+    {
+        return $this->repository->getId();
     }
 }

@@ -12,3 +12,13 @@ login:
     path: /login
     controller: App\Interfaces\Controller\UserController::login
     methods: [POST]
+
+getCart:
+    path: /cart
+    controller: App\Interfaces\Controller\CartController::getCart
+    methods: [GET]
+
+addProductToCart:
+    path: /cart/add
+    controller: App\Interfaces\Controller\CartController::addProductToCart
+    methods: [POST]

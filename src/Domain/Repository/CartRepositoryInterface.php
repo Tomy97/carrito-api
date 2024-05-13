@@ -15,4 +15,14 @@ interface CartRepositoryInterface
     public function findAll(): array;
 
     public function findOneBy(): Cart;
+
+    public function getProducts(): array;
+
+    public function addProduct($product): void;
+
+    public function removeProduct($product): void;
+
+    public function getTotal(): float;
+
+    public function getId(): int;
 }

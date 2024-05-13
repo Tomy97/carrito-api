@@ -45,4 +45,19 @@ class DoctrineUserRepository implements UserRepositoryInterface
     {
         return $this->repository->find($id);
     }
+
+    public function getUser(int $id): ?User
+    {
+        return $this->repository->find($id);
+    }
+
+    public function getProducts(int $id): array
+    {
+        return $this->repository->getProducts();
+    }
+
+    public function getTotal(): float
+    {
+        return $this->repository->getTotal();
+    }
 }

@@ -31,6 +31,11 @@ services:
     autowire: true
     tags: [ 'controller.service_arguments' ]
 
+  App\Interfaces\Controller\CartController:
+    public: true
+    autowire: true
+    tags: [ 'controller.service_arguments' ]
+
   ## Doctrine
   App\Infrastructure\Repository\DoctrineProductRepository:
     arguments:
@@ -50,6 +55,12 @@ services:
     autowire: true
     autoconfigure: true
 
+  App\Infrastructure\Repository\DoctrineCartRepository:
+    arguments:
+      $entityManager: '@doctrine.orm.entity_manager'
+    autowire: true
+    public: false
+
   ## Services
   App\Application\Service\ProductService:
     arguments:
@@ -62,6 +73,10 @@ services:
       $rolRepository: '@App\Infrastructure\Repository\DoctrineRolRepository'
       $cartRepository: '@App\Infrastructure\Repository\DoctrineCartRepository'
 
+  App\Application\Service\CartService:
+    arguments:
+      $cartRepository: '@App\Infrastructure\Repository\DoctrineCartRepository'
+
   ## Repositorys
 
   App\Repository\UserRepository:
@@ -71,6 +86,3 @@ services:
 doctrine_migrations:
   migrations_paths:
     "DoctrineMigrations": "%kernel.project_dir%/migrations"
-
-  # add more service definitions when explicit configuration is needed
-  # please note that last definitions always *replace* previous ones

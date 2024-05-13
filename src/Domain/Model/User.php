@@ -2,46 +2,46 @@
 
 namespace App\Domain\Model;
 
-use App\Domain\Model\Order;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-class User implements \Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface
+#[UniqueEntity(fields: ['email'])]
+class User implements PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(type: "integer")]
+    #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
-    #[ORM\Column(type: "string", length: 180, unique: true)]
-    private string $email;
-
-    #[ORM\Column(type: "string")]
-    private string $password;
-
-    #[ORM\Column(type: "string", length: 255)]
+    #[ORM\Column(type: 'string', length: 255)]
     private string $name;
 
-    #[ORM\Column(type: "decimal", precision: 10, scale: 2,)]
+    #[ORM\Column(type: 'string', length: 255, unique: true)]
+    private string $email;
+
+    #[ORM\Column(type: 'string')]
+    private string $password;
+
+    #[ORM\Column(type: "decimal", precision: 10, scale: 2)]
     private float $balance = 0;
 
-    #[ORM\ManyToOne(targetEntity: Rol::class, inversedBy: "users")]
-    #[ORM\JoinColumn(name: "rol_id", referencedColumnName: "id")]
+    #[ORM\ManyToOne(targetEntity: Rol::class, inversedBy: 'users')]
+    #[ORM\JoinColumn(name: 'rol_id', referencedColumnName: 'id')]
     private ?Rol $rol = null;
 
-    #[ORM\ManyToOne(targetEntity: Cart::class, inversedBy: "users")]
-    #[ORM\JoinColumn(name: "cart_id", referencedColumnName: "id")]
+    #[ORM\OneToOne(targetEntity: Cart::class, mappedBy: 'user', cascade: ['persist', 'remove'])]
     private ?Cart $cart = null;
 
 
     public function __construct()
     {
-        $this->products = new ArrayCollection();
-        $this->orders = new ArrayCollection();
+        $this->carts = new ArrayCollection();
     }
-   
+
     public function getId(): ?int
     {
         return $this->id;
@@ -86,12 +86,6 @@ class User implements \Symfony\Component\Security\Core\User\PasswordAuthenticate
         return $this->balance;
     }
 
-    public function setBalance(float $balance): self
-    {
-        $this->balance = $balance;
-        return $this;
-    }
-
     public function getRol(): ?Rol
     {
         return $this->rol;
@@ -108,9 +102,22 @@ class User implements \Symfony\Component\Security\Core\User\PasswordAuthenticate
         return $this->cart;
     }
 
+    public function addCart(Cart $cart): self
+    {
+        if (!$this->carts->contains($cart)) {
+            $this->carts[] = $cart;
+            $cart->setUser($this);
+        }
+        return $this;
+    }
+
     public function setCart(?Cart $cart): self
     {
         $this->cart = $cart;
+        if ($cart !== null && $cart->getUser() !== $this) {
+            $cart->setUser($this);
+        }
         return $this;
     }
+
 }

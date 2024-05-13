@@ -23,7 +23,7 @@ class Product
     private string $category;
 
     #[ORM\Column(type: "decimal", precision: 10, scale: 2)]
-    private float $price;
+    private float $price = 0;
 
     #[ORM\Column]
     private int $stock;

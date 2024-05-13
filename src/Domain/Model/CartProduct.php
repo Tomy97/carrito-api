@@ -13,7 +13,7 @@ class CartProduct
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(targetEntity: Cart::class, inversedBy: 'items')]
+    #[ORM\ManyToOne(targetEntity: Cart::class, inversedBy: 'cartProducts')]
     #[ORM\JoinColumn(name: 'cart_id', referencedColumnName: 'id', nullable: false)]
     private Cart $cart;
 
@@ -23,8 +23,6 @@ class CartProduct
 
     #[ORM\Column(type: 'integer')]
     private int $quantity;
-
-    // Getters and setters...
 
     public function getId(): ?int
     {

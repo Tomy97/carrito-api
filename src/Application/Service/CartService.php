@@ -2,34 +2,27 @@
 
 namespace App\Application\Service;
 
-use App\Application\DTO\CartData;
+use App\Domain\Model\Cart;
 use App\Domain\Repository\CartRepositoryInterface;
-use App\Domain\Repository\ProductRepositoryInterface;
-use App\Domain\Repository\UserRepositoryInterface;
 
 class CartService
 {
-    private UserRepositoryInterface $userRepository;
     private CartRepositoryInterface $cartRepository;
-    private ProductRepositoryInterface $productRepository;
 
-    public function __construct(UserRepositoryInterface $userRepository, CartRepositoryInterface $cartRepository, ProductRepositoryInterface $productRepository)
+    public function __construct(CartRepositoryInterface $cartRepository)
     {
-        $this->userRepository = $userRepository;
         $this->cartRepository = $cartRepository;
-        $this->productRepository = $productRepository;
     }
 
-    public function getCartService(int $userId): CartData
+    public function getCartService(int $userId): Cart
     {
-        $user = $this->userRepository->findById($userId);
-        $cart = $this->cartRepository->findByUserId($user->getId());
-        $cartItems = $this->cartRepository->getCartItems($cart);
+        return $this->cartRepository->findByUserId($userId);
+    }
 
-        $cartData = new CartData();
-        $cartData->setUser($user);
-        $cartData->setCartItems($cartItems);
-
-        return $cartData;
+    public function addCartService(int $userId, $product): void
+    {
+        $cart = $this->cartRepository->findByUserId($userId);
+        $cart->addProduct($product);
+        $this->cartRepository->save($cart);
     }
 }

@@ -50,4 +50,15 @@ class DoctrineProductRepository implements ProductRepositoryInterface
     {
         $this->entityManager->flush();
     }
+
+    public function getProduct($productId): Product
+    {
+        return $this->repository->find($productId);
+    }
+
+    public function addProduct($product): void
+    {
+        $this->entityManager->persist($product);
+        $this->entityManager->flush();
+    }
 }

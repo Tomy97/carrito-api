@@ -39,21 +39,19 @@ class UserService
         $user->setPassword($this->passwordHasher->hashPassword($user, $password));
         $user->setName($name);
 
-        // Asigna el rol por defecto de usuario (Asi lo tengo en la base de datos), pero si viene el dato por parametro, lo asigna como admin
-
-        if ($rol !== null && $rol === 'admin') {
-            $role = $this->rolRepository->getRol(1);
-        } else {
-            $role = $this->rolRepository->getRol(2);
-        }
-        $user->setRol($role);
-
-        // Crea un carrito vacio para el usuario registrado
         $cart = new Cart();
-        $this->cartRepository->save($cart);
         $user->setCart($cart);
 
+        if ($rol !== null && $rol === 'admin') {
+            $rol = $this->rolRepository->getRol(1);
+        } else {
+            $rol = $this->rolRepository->getRol(2);
+        }
+        $user->setRol($rol);
+
+        $this->cartRepository->save($cart);
         $this->userRepository->save($user);
+
         return $user;
     }
 

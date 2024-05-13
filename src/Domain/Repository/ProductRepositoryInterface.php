@@ -11,4 +11,5 @@ interface ProductRepositoryInterface
     public function findBy(array $criteria): array;
     public function save(Product $product): void;
     public function remove(Product $product): void;
+    public function getProduct($productId): Product;
 }
