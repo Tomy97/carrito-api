@@ -27,4 +27,6 @@ interface CartRepositoryInterface
     public function getId(): int;
 
     public function findCartWithProducts(int $userId): Cart;
+
+    public function findCartProductById(int $productId);
 }

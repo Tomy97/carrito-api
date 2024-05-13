@@ -6,12 +6,10 @@ use App\Application\Service\CartService;
 use App\Domain\Model\Cart;
 use App\Domain\Model\CartProduct;
 use App\Domain\Repository\ProductRepositoryInterface;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\HttpFoundation\Response;
 
 class CartController extends AbstractController
@@ -41,7 +39,6 @@ class CartController extends AbstractController
             return new JsonResponse(['error' => 'Cart not found'], Response::HTTP_NOT_FOUND);
         }
 
-        // Luego, puedes manejar la serialización manualmente si no usas Serializer
         return new JsonResponse($this->formatCart($cart));
     }
 
@@ -53,7 +50,10 @@ class CartController extends AbstractController
                 return [
                     'id' => $cartProduct->getProduct()->getId(),
                     'name' => $cartProduct->getProduct()->getName(),
-                    'quantity' => $cartProduct->getQuantity()
+                    'price' => $cartProduct->getProduct()->getPrice(),
+                    'quantity' => $cartProduct->getQuantity(),
+                    'stock' => $cartProduct->getProduct()->getStock(),
+                    'image' => $cartProduct->getProduct()->getImageFilename()
                 ];
             }, $cart->getCartProducts()->toArray())
         ];
@@ -72,4 +72,23 @@ class CartController extends AbstractController
         return new JsonResponse(['message' => 'Product added to cart successfuly'], status: Response::HTTP_CREATED);
     }
 
+    #[Route('/cart', name: 'delete_cart', methods: ['DELETE'])]
+    public function removeProductFromCart(Request $request): JsonResponse
+    {
+        $productId = $request->get('productId');
+
+        $this->cartService->removeProductToCartService($productId);
+        return new JsonResponse(['message' => 'Cart deleted successfuly'], status: Response::HTTP_OK);
+    }
+
+    #[Route('/cart/checkout', name: 'checkout_cart', methods: ['POST'])]
+    public function checkout(Request $request): JsonResponse
+    {
+        $userId = $request->get('userId');
+        if ($userId === null) {
+            return new JsonResponse(['error' => 'User id is required'], Response::HTTP_BAD_REQUEST);
+        }
+        $this->cartService->checkoutCartService($userId);
+        return new JsonResponse(['message' => 'Cart checked out successfuly'], status: Response::HTTP_OK);
+    }
 }

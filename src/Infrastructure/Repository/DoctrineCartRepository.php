@@ -3,6 +3,7 @@
 namespace App\Infrastructure\Repository;
 
 use App\Domain\Model\Cart;
+use App\Domain\Model\CartProduct;
 use App\Domain\Repository\CartRepositoryInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
@@ -85,6 +86,17 @@ class DoctrineCartRepository implements CartRepositoryInterface
             ->leftJoin('cp.product', 'p')       // CartProduct tiene una propiedad product
             ->where('c.user = :userId')
             ->setParameter('userId', $userId);
+
+        return $qb->getQuery()->getOneOrNullResult();
+    }
+
+    public function findCartProductById(int $productId)
+    {
+        $qb = $this->entityManager->createQueryBuilder();
+        $qb->select('cp')
+            ->from(CartProduct::class, 'cp')
+            ->where('cp.product = :productId')
+            ->setParameter('productId', $productId);
 
         return $qb->getQuery()->getOneOrNullResult();
     }

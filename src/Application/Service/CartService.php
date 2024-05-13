@@ -32,4 +32,19 @@ class CartService
 
         $this->cartRepository->save($cart);
     }
+
+    public function removeProductToCartService(int $productId): void
+    {
+        $cartProduct = $this->cartRepository->findCartProductById($productId);
+        $cart = $cartProduct->getCart();
+        $cart->getCartProducts()->removeElement($cartProduct);
+        $this->cartRepository->save($cart);
+    }
+
+    public function checkoutCartService(int $userId): void
+    {
+        $cart = $this->cartRepository->findByUserId($userId);
+        $cart->getCartProducts()->clear();
+        $this->cartRepository->save($cart);
+    }
 }

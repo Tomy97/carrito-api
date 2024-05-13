@@ -10,7 +10,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[AllowDynamicProperties] #[ORM\Entity(repositoryClass: CartRepository::class)]
-
 class Cart
 {
     #[ORM\Id]
@@ -78,5 +77,17 @@ class Cart
     public function getCartProducts(): Collection
     {
         return $this->cartProducts;
+    }
+
+    public function getCartProductByProductId(int $productId)
+    {
+        return $this->cartProducts->filter(function (CartProduct $cartProduct) use ($productId) {
+            return $cartProduct->getProduct()->getId() === $productId;
+        })->first();
+    }
+
+    public function removeCartProduct(mixed $cartProduct): void
+    {
+        $this->cartProducts->removeElement($cartProduct);
     }
 }
