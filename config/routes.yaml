@@ -19,6 +19,6 @@ getCart:
     methods: [GET]
 
 addProductToCart:
-    path: /cart/add
+    path: /cart
     controller: App\Interfaces\Controller\CartController::addProductToCart
     methods: [POST]

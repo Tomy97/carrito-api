@@ -3,12 +3,15 @@
 namespace App\Domain\Model;
 
 use AllowDynamicProperties;
+use App\Infrastructure\Repository\DoctrineCartRepository;
 use App\Repository\CartRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
-#[AllowDynamicProperties] #[ORM\Entity(repositoryClass: CartRepository::class)]
+#[AllowDynamicProperties] #[ORM\Entity(repositoryClass: DoctrineCartRepository::class)]
+
 class Cart
 {
     #[ORM\Id]
@@ -21,7 +24,9 @@ class Cart
     private ?User $user = null;
 
     #[ORM\OneToMany(targetEntity: CartProduct::class, mappedBy: 'cart', cascade: ['persist', 'remove'])]
+    #[Groups(['cart_details'])]
     private Collection $cartProducts;
+
     public function __construct()
     {
         $this->cartProducts = new ArrayCollection();
@@ -53,9 +58,14 @@ class Cart
     public function setUser(?User $user): User
     {
         return $this->user = $user;
-
-
     }
 
-
+    public function addCartProduct(CartProduct $cartProduct): Cart
+    {
+        if (!$this->cartProducts->contains($cartProduct)) {
+            $this->cartProducts->add($cartProduct);
+            $cartProduct->setCart($this);
+        }
+        return $this;
+    }
 }

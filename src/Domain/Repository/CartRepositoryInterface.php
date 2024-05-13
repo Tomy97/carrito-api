@@ -25,4 +25,6 @@ interface CartRepositoryInterface
     public function getTotal(): float;
 
     public function getId(): int;
+
+    public function findCartWithProducts(int $userId): Cart;
 }

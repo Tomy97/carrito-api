@@ -33,9 +33,11 @@ class DoctrineCartRepository implements CartRepositoryInterface
 
     public function findByUserId($userId): Cart
     {
-        return $this->entityManager->getRepository(Cart::class)->findOneBy([
-            'user' => $userId
-        ]);
+        $cart = $this->entityManager->getRepository(Cart::class)->findOneBy(['user' => $userId]);
+        if (!$cart) {
+            throw new \Exception("Cart not found for user id: $userId");
+        }
+        return $cart;
     }
 
 
@@ -72,5 +74,15 @@ class DoctrineCartRepository implements CartRepositoryInterface
     public function getId(): int
     {
         return $this->repository->getId();
+    }
+
+    public function findCartWithProducts(int $userId): Cart
+    {
+        $qb = $this->entityManager->createQueryBuilder();
+        $qb->select('c', 'p')
+            ->from(Cart::class, 'c')
+            ->leftJoin('c.products', 'p')
+            ->where('c.user = :userId')
+            ->setParameter('userId', $userId);
     }
 }
