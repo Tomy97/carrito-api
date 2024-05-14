@@ -82,12 +82,12 @@ class UserController extends AbstractController
                     'balance' => $user->getBalance(),
                 ],
                 'message' => 'Usuario logueado correctamente'
-            ]);
+            ], Response::HTTP_OK);
         }
 
         return new JsonResponse([
             'success' => false,
             'message' => 'Credenciales Invalidas'
-        ]);
+        ], Response::HTTP_UNAUTHORIZED);
     }
 }

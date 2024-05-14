@@ -5,10 +5,8 @@ namespace App\Infrastructure\Repository;
 use App\Domain\Model\Cart;
 use App\Domain\Model\CartProduct;
 use App\Domain\Repository\CartRepositoryInterface;
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\Query\Parameter;
 
 class DoctrineCartRepository implements CartRepositoryInterface
 {
@@ -84,23 +82,50 @@ class DoctrineCartRepository implements CartRepositoryInterface
         $qb = $this->entityManager->createQueryBuilder();
         $qb->select('c', 'cp', 'p')
             ->from(Cart::class, 'c')
-            ->leftJoin('c.cartProducts', 'cp')  // Se asume que en Cart está definido cartProducts
-            ->leftJoin('cp.product', 'p')       // CartProduct tiene una propiedad product
+            ->leftJoin('c.cartProducts', 'cp')
+            ->leftJoin('cp.product', 'p')
             ->where('c.user = :userId')
             ->setParameter('userId', $userId);
 
         return $qb->getQuery()->getOneOrNullResult();
     }
 
-    public function findCartProductById(int $productId, int $cartId): Cart
+    public function findCartProductById(int $cartProductId): Cart
     {
         $qb = $this->entityManager->createQueryBuilder();
-        $qb->select('cp')
-            ->from(CartProduct::class, 'cp')
-            ->where('cp.product = :productId')
-            ->andWhere('cp.cart = :cartId')
-            ->setParameters(new ArrayCollection(array(new Parameter('productId', $productId), new Parameter('cartId', $cartId))));
+        $qb->select('c', 'cp', 'p')
+            ->from(Cart::class, 'c')
+            ->leftJoin('c.cartProducts', 'cp')
+            ->leftJoin('cp.product', 'p')
+            ->where('cp.id = :cartProductId')
+            ->setParameter('cartProductId', $cartProductId);
 
         return $qb->getQuery()->getOneOrNullResult();
+    }
+
+    public function consolidateCartProducts(int $cartId): void
+    {
+        $cartProducts = $this->entityManager->getRepository(CartProduct::class)->findBy(['cart' => $cartId]);
+
+        $consolidated = [];
+        foreach ($cartProducts as $cartProduct) {
+            $productId = $cartProduct->getProduct()->getId();
+            if (!isset($consolidated[$productId])) {
+                $consolidated[$productId] = $cartProduct;
+            } else {
+                $existingQuantity = $consolidated[$productId]->getQuantity();
+                $consolidated[$productId]->setQuantity($existingQuantity + $cartProduct->getQuantity());
+
+                $this->entityManager->remove($cartProduct);
+            }
+        }
+        $this->entityManager->flush();
+    }
+
+    public function removeProductToCart(int $cartProductId): void
+    {
+        $cartProduct = $this->entityManager->getRepository(CartProduct::class)->find($cartProductId);
+        $this->entityManager->remove($cartProduct);
+        $this->entityManager->flush();
     }
 }

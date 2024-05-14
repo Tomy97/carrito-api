@@ -2,6 +2,7 @@
 
 namespace App\Interfaces\Controller;
 
+use App\Application\Service\FileUploader;
 use App\Application\Service\ProductService;
 use App\Domain\Model\Product;
 use App\Form\ProductType;
@@ -54,35 +55,54 @@ class ProductController extends AbstractController
      * @Route('/products', methods={"POST"})
      */
 
-    public function createProduct(Request $request): Response
+    /**
+     * @Route("/products", name="create_product", methods={"POST"})
+     */
+    public function createProduct(Request $request): JsonResponse
     {
         $product = new Product();
-        $form = $this->createForm(ProductType::class, $product);
-        $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $file = $form->get('image')->getData();
-            if ($file) {
-                $filename = $this->generateUniqueFileName() . '.' . $file->guessExtension();
-                try {
-                    $file->move($this->getParameter('images_directory'), $filename);
-                } catch (FileException $e) {
-                    return new JsonResponse(['error' => 'Error uploading file'], Response::HTTP_INTERNAL_SERVER_ERROR);
-                }
+        $name = $request->request->get('name');
+        $description = $request->request->get('description');
+        // Añade un var_dump o log para ver los valores recibidos:
+        var_dump($name, $description);
+
+        $product->setName($request->request->get('name'));
+        $product->setDescription($request->request->get('description'));
+        $product->setPrice($request->request->get('price'));
+        $product->setStock($request->request->get('stock'));
+        $product->setCategory($request->request->get('category'));
+
+        $file = $request->files->get('image');
+        if ($file) {
+            $filename = $this->generateUniqueFileName() . '.' . $file->guessExtension();
+
+            try {
+                $file->move($this->getParameter('images_directory'), $filename);
                 $product->setImageFilename($filename);
+            } catch (FileException $e) {
+                return new JsonResponse(['error' => 'Failed to upload file'], Response::HTTP_INTERNAL_SERVER_ERROR);
             }
-
-            $this->entityManager->persist($product);
-            $this->entityManager->flush();
-
-            return new JsonResponse(['status' => 'Product created'], Response::HTTP_CREATED);
         }
 
-        return new JsonResponse(['error' => 'Invalid data'], Response::HTTP_BAD_REQUEST);
+        $this->entityManager->persist($product);
+        $this->entityManager->flush();
+
+        return new JsonResponse(['status' => 'Product created'], Response::HTTP_CREATED);
     }
 
     private function generateUniqueFileName(): string
     {
+        // This generates a unique name for the file
         return md5(uniqid());
+    }
+
+    private function getFormErrors($form): array
+    {
+        $errors = [];
+        foreach ($form->getErrors(true) as $error) {
+            $errors[$error->getOrigin()->getName()] = $error->getMessage();
+        }
+        return $errors;
     }
 }

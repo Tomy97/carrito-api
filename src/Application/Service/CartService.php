@@ -5,19 +5,25 @@ namespace App\Application\Service;
 use App\Domain\Model\Cart;
 use App\Domain\Model\CartProduct;
 use App\Domain\Repository\CartRepositoryInterface;
+use Doctrine\ORM\EntityManagerInterface;
 
 class CartService
 {
     private CartRepositoryInterface $cartRepository;
 
-    public function __construct(CartRepositoryInterface $cartRepository)
+    private EntityManagerInterface $entityManager;
+
+    public function __construct(CartRepositoryInterface $cartRepository, EntityManagerInterface $entityManager)
     {
         $this->cartRepository = $cartRepository;
+        $this->entityManager = $entityManager;
     }
 
     public function getCartService(int $userId): Cart
     {
-        return $this->cartRepository->findCartWithProducts($userId);
+        $cart = $this->cartRepository->findCartWithProducts($userId);
+        $this->cartRepository->consolidateCartProducts($cart->getId());
+        return $cart;
     }
 
     public function addCartService(int $userId, $product, int $quantity = 1): void
@@ -33,12 +39,14 @@ class CartService
         $this->cartRepository->save($cart);
     }
 
-    public function removeProductToCartService(int $productId): void
+    public function removeProductToCartService(int $cartProductId): void
     {
-        $cartProduct = $this->cartRepository->findCartProductById($productId);
-        $cart = $cartProduct->getCart();
-        $cart->getCartProducts()->removeElement($cartProduct);
-        $this->cartRepository->save($cart);
+        try {
+            $this->cartRepository->removeProductToCart($cartProductId);
+        } catch (\Exception $e) {
+            error_log($e->getMessage());
+            throw $e;
+        }
     }
 
     public function checkoutCartService(int $userId): void

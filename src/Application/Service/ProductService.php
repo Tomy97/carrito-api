@@ -2,6 +2,7 @@
 
 namespace App\Application\Service;
 
+use App\Domain\Model\Product;
 use App\Domain\Repository\ProductRepositoryInterface;
 use App\Application\DTO\ProductData;
 
@@ -27,5 +28,10 @@ class ProductService
                 $product->getImageFilename()
             );
         }, $this->productRepository->findAll());
+    }
+
+    public function createProduct(Product $product): void
+    {
+        $this->productRepository->save($product);
     }
 }

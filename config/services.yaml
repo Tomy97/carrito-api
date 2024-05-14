@@ -77,7 +77,11 @@ services:
   App\Application\Service\CartService:
     arguments:
       $cartRepository: '@App\Infrastructure\Repository\DoctrineCartRepository'
+      $entityManager: '@doctrine.orm.entity_manager'
 
+  App\Application\Service\FileUploader:
+    arguments:
+      $targetDirectory: '%images_directory%'
   ## Repositorys
 
   App\Repository\UserRepository:

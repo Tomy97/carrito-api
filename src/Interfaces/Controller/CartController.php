@@ -46,31 +46,27 @@ class CartController extends AbstractController
     {
         $productsAggregated = [];
 
+        // Iteramos sobre cada CartProduct en el carrito
         foreach ($cart->getCartProducts() as $cartProduct) {
-            $productId = $cartProduct->getProduct()->getId();
-            if (!isset($productsAggregated[$productId])) {
-                $productsAggregated[$productId] = [
-                    'id' => $productId,
-                    'name' => $cartProduct->getProduct()->getName(),
-                    'price' => $cartProduct->getProduct()->getPrice() * $cartProduct->getQuantity(),
-                    'quantity' => $cartProduct->getQuantity(),
-                    'stock' => $cartProduct->getProduct()->getStock(),
-                    'image' => $cartProduct->getProduct()->getImageFilename(),
-                ];
-            } else {
-                $productsAggregated[$productId]['quantity'] += $cartProduct->getQuantity();
-                $productsAggregated[$productId]['price'] += $cartProduct->getProduct()->getPrice() * $cartProduct->getQuantity();
-            }
+            // Extraemos el ID único de CartProduct, que identifica cada entrada en la tabla cart_product
+            $cartProductId = $cartProduct->getId();  // Este es el ID de CartProduct, no el ID de Cart
+
+            // Agregamos un nuevo producto al arreglo de productos agregados
+            $productsAggregated[] = [
+                'cartProductId' => $cartProductId,  // Guardamos el ID de CartProduct
+                'id' => $cartProduct->getProduct()->getId(),  // Este es el ID del producto
+                'name' => $cartProduct->getProduct()->getName(),
+                'price' => $cartProduct->getProduct()->getPrice() * $cartProduct->getQuantity(),
+                'quantity' => $cartProduct->getQuantity(),
+                'stock' => $cartProduct->getProduct()->getStock(),
+                'image' => $cartProduct->getProduct()->getImageFilename(),
+            ];
         }
 
-        // Debugging: Imprimir las URLs justo antes de devolver la respuesta
-        foreach ($productsAggregated as $product) {
-            error_log("URL de la imagen: " . $product['image']);
-        }
-
+        // Devolvemos un arreglo con el ID del carrito y la lista de productos agregados
         return [
-            'id' => $cart->getId(),
-            'products' => array_values($productsAggregated)
+            'id' => $cart->getId(),  // ID del carrito
+            'products' => $productsAggregated  // Arreglo de productos con detalles, incluyendo el ID de CartProduct
         ];
     }
 
@@ -90,9 +86,9 @@ class CartController extends AbstractController
     #[Route('/cart', name: 'delete_cart', methods: ['DELETE'])]
     public function removeProductFromCart(Request $request): JsonResponse
     {
-        $productId = $request->get('productId');
+        $cartProductId = $request->get('cartProductId');
 
-        $this->cartService->removeProductToCartService($productId);
+        $this->cartService->removeProductToCartService($cartProductId);
         return new JsonResponse(['message' => 'Cart deleted successfuly'], status: Response::HTTP_OK);
     }
 
